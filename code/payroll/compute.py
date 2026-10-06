@@ -73,14 +73,18 @@ def add_gross_pay(payroll: pd.DataFrame) -> pd.DataFrame:
         lambda row: calc_gross_pay(row["hours_worked"], row["hourly_rate_usd"])
     """
     out = payroll.copy()
-    out["gross_pay"] = out.apply(lambda row: calc_gross_pay(row["hours_worked"], row["hourly_rate_usd"]), axis=1)
+    out["gross_pay"] = out.apply(lambda row: calc_gross_pay(row["hours_worked"],
+                                                            row["hourly_rate_usd"]),
+                                                            axis=1)
     return out
 
 
 def add_pay_type(payroll: pd.DataFrame) -> pd.DataFrame:
     """Return a copy with one new column, `pay_type`: `classify_pay` for every row."""
     out = payroll.copy()
-    out["pay_type"] = out.apply(lambda row: classify_pay(row["hours_worked"], row["hourly_rate_usd"]), axis=1)
+    out["pay_type"] = out.apply(lambda row: classify_pay(row["hours_worked"],
+                                                         row["hourly_rate_usd"]),
+                                                         axis=1)
     return out
 
 

@@ -98,7 +98,7 @@ def clean_currency(value) -> float:
     """
     if not isinstance(value, str):
         if pd.isna(value):
-          return 0.0
+            return 0.0
         else:
             return float(value)
     text = value.replace('$', '').replace(',', '').strip()
@@ -106,6 +106,7 @@ def clean_currency(value) -> float:
         return float(text)
     except ValueError:
         return 0.0
+
 
 def add_hours_worked(timesheet: pd.DataFrame) -> pd.DataFrame:
     """Return a copy of the timesheet with one new column, `hours_worked` (float).
@@ -122,11 +123,10 @@ def add_hours_worked(timesheet: pd.DataFrame) -> pd.DataFrame:
     - `return out`. Three lines. Every pipeline step in this assignment has this
       shape: copy, add a column, return.
     """
-    
+
     out = timesheet.copy()
     out["hours_worked"] = out["hours"].apply(parse_hours)
     return out
-    
 
 
 def add_hourly_rate(employees: pd.DataFrame) -> pd.DataFrame:
