@@ -80,7 +80,8 @@ if upload is not None:
     unmatched_rows = payroll[payroll['pay_type'] == 'unmatched']
     if len(unmatched_rows) > 0:
         st.warning(f"Unmatched employee_id(s): {', '.join
-                                                (map(str, unmatched_rows['employee_id']))}")
+                                                (map(str, unmatched_rows
+                                                     ['employee_id']))}")
     else:
         st.success("All employee IDs matched!")
         st.dataframe(payroll)
