@@ -38,3 +38,58 @@ Test it: pytest tests/test_pipeline.py -k app
 #
 # What the page does NOT do: arithmetic on rows, cleaning, merging. If you find
 # yourself writing a loop or an apply here, that logic belongs in the package.
+
+
+import streamlit as st
+
+
+from payroll import (load_employees, load_timesheet, build_payroll, payroll_export)
+
+st.title("Salt City Coffee - weekly Payroll")
+st.write("Upload this week's timesheet export. The roster is loaded automatically.Check\
+          the totals, fix anything flagged, and then download the file for the payroll\
+          provider.")
+
+roster = load_employees()
+upload = st.file_uploader("Upload timesheet", key="timesheet")
+
+if upload is not None:
+    timesheet = load_timesheet(upload)
+    payroll = build_payroll(timesheet, roster)
+    pay_period = payroll['payroll_date'].iloc[0]
+    st.subheader(f"Pay Period: {pay_period}")
+
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        paid_employees = payroll[payroll['gross_pay'] > 0]
+        employees_paid = len(paid_employees)
+        st.metric("Employees paid", str(employees_paid))
+
+    with col2:
+        total_hours = payroll['hours_worked'].sum()
+        st.metric("Total hours", f"{total_hours:.2f}")
+
+    with col3:
+        paid_payroll = payroll[payroll['gross_pay'] > 0]
+        total_gross_pay = paid_payroll['gross_pay'].sum()
+        st.metric("Total gross pay", f"${total_gross_pay:,.2f}")
+    with col4:
+        overtime_rows = payroll[payroll['hours_worked'] > 40.1]
+        overtime_count = len(overtime_rows)
+        st.metric("Overtime weeks", str(overtime_count))
+    unmatched_rows = payroll[payroll['pay_type'] == 'unmatched']
+    if len(unmatched_rows) > 0:
+        st.warning(f"Unmatched employee_id(s): {', '.join
+                                                (map(str, unmatched_rows['employee_id']))}")
+    else:
+        st.success("All employee IDs matched!")
+        st.dataframe(payroll)
+    st.dataframe(payroll)
+    csv_data = payroll_export(payroll).to_csv(index=False)
+    st.download_button(
+        label="Download Payroll CSV",
+        data=csv_data,
+        file_name="payroll_export.csv",
+        mime="text/csv",
+        key="download"
+        )
